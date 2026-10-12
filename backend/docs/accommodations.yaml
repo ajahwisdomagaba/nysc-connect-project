@@ -1,0 +1,141 @@
+openapi: 3.0.3
+info:
+  title: NYSC Connect - Accommodation intake endpoints
+  version: 0.1.0
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+
+paths:
+  /accommodations:
+    post:
+      summary: Create a listing (Admin, vetted Landlord)
+      description: Landlord submissions are saved as status `active` with verificationStatus `pending`. Admin submissions may set status and landlord.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AccommodationInput' }
+      responses:
+        '201': { $ref: '#/components/responses/Created' }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+
+  /accommodations/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      summary: Get one listing
+      description: Non-admins and non-owners only see listings that are `active` and `verified`.
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+        '404': { $ref: '#/components/responses/Error' }
+    put:
+      summary: Update a listing (Admin, owning Landlord)
+      description: Only Admins can change `status` and `verificationStatus`. A Landlord editing a verified listing resets it to verificationStatus `pending`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AccommodationInput' }
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+        '400': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+    delete:
+      summary: Archive a listing (soft delete)
+      responses:
+        '200':
+          description: Listing archived
+          content:
+            application/json:
+              example: { status: success, message: Listing archived }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+
+  schemas:
+    AccommodationInput:
+      type: object
+      required: [title, accommodationType, state, lga, address, annualRent, contactPhone]
+      properties:
+        title: { type: string, maxLength: 120 }
+        description: { type: string, maxLength: 2000 }
+        accommodationType:
+          type: string
+          enum: [single-room, self-contain, room-and-parlour, one-bedroom, two-bedroom, shared-apartment]
+        state: { type: string, description: State id }
+        lga: { type: string, description: LGA id (must belong to state) }
+        address: { type: string }
+        landmark: { type: string }
+        annualRent: { type: number, minimum: 1 }
+        cautionFee: { type: number, minimum: 0 }
+        agencyFee: { type: number, minimum: 0 }
+        amenities:
+          type: array
+          items:
+            type: string
+            enum: [borehole, electricity, prepaid-meter, security, fenced, tiled, water-supply, parking]
+        contactPhone: { type: string }
+        landlord: { type: string, description: Admin only }
+        status:
+          type: string
+          enum: [active, inactive, archived]
+          description: Admin only. Is the listing live?
+        verificationStatus:
+          type: string
+          enum: [pending, verified, rejected, flagged]
+          description: Admin only. Has the listing been approved?
+
+    Accommodation:
+      allOf:
+        - $ref: '#/components/schemas/AccommodationInput'
+        - type: object
+          properties:
+            _id: { type: string }
+            images:
+              type: array
+              maxItems: 3
+              items:
+                type: object
+                properties:
+                  url: { type: string }
+                  publicId: { type: string }
+            status: { type: string }
+            verificationStatus: { type: string }
+            createdAt: { type: string, format: date-time }
+            updatedAt: { type: string, format: date-time }
+
+  responses:
+    Ok:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status: { type: string, example: success }
+              data: { $ref: '#/components/schemas/Accommodation' }
+    Created:
+      description: Created
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status: { type: string, example: success }
+              data: { $ref: '#/components/schemas/Accommodation' }
+    Error:
+      description: Error
+      content:
+        application/json:
+          example: { status: error, message: Description of what went wrong }
