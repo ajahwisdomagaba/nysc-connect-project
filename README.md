@@ -8,9 +8,9 @@ Centralized repository containing the Product Requirements (PRD), Backend API, a
 - `/docs`: Product requirements documentation (PRD), API v1.1 specs, and architecture diagrams.
 
 ## Team Workflow
-1. Never push directly to `main` or `dev`.
-2. Branch off `dev` using the standard convention:
+1. Never push directly to `main`.
+2. Branch off `main` using the standard convention:
    - `feat/frontend-<feature-name>`
    - `feat/backend-<feature-name>`
    - `docs/<doc-name>`
-3. Open a Pull Request targeting `dev` for review.
+3. Open a Pull Request targeting `main` for review.
