@@ -381,7 +381,7 @@ Searches and filters the public feed. Only listings with `status: "active"` and 
 * **Access:** Public
 * **Query Parameters:**
 * `state`, `lga`, `minPrice`, `maxPrice`
-* `accommodationType`, `amenities`, `sort`
+* `accommodationType` (`single-room`, `self-contain`, `room-and-parlour`, `one-bedroom`, `two-bedroom`, `shared-apartment`), `amenities`, `sort` (`newest`, `price_asc`, `price_desc`)
 * `page` (default: `1`), `limit` (default: `10`, max: `50`)
 
 
@@ -401,8 +401,10 @@ Searches and filters the public feed. Only listings with `status: "active"` and 
         "_id": "66f7f9876a1b2c3d4e5f0001",
         "title": "Self-contain lodge near Ikeja Secretariat",
         "description": "Clean self-contain apartment with borehole water and prepaid meter.",
+        "accommodationType": "self-contain",
         "price": 320000,
         "caution_fee": 30000,
+        "agency_fee": 0,
         "address": "14 Allen Avenue, Ikeja, Lagos",
         "state": "Lagos",
         "lga": "Ikeja",
@@ -410,6 +412,7 @@ Searches and filters the public feed. Only listings with `status: "active"` and 
         "photos": [
           "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267"
         ],
+        "amenities": [],
         "property_info": [
           "borehole_water",
           "prepaid_meter",
@@ -420,6 +423,7 @@ Searches and filters the public feed. Only listings with `status: "active"` and 
         "source": "Alumni Referral",
         "status": "active",
         "verification_status": "verified",
+        "created_at": "2026-09-30T10:00:00.000Z",
         "last_updated": "2026-09-30T10:00:00.000Z"
       }
     ]
@@ -455,8 +459,10 @@ Retrieves single listing details. A listing that is not both `active` and `verif
     "_id": "66f7f9876a1b2c3d4e5f0001",
     "title": "Self-contain lodge near Ikeja Secretariat",
     "description": "Clean self-contain apartment with borehole water and prepaid meter.",
+    "accommodationType": "self-contain",
     "price": 320000,
     "caution_fee": 30000,
+    "agency_fee": 0,
     "address": "14 Allen Avenue, Ikeja, Lagos",
     "state": "Lagos",
     "lga": "Ikeja",
@@ -488,6 +494,12 @@ A landlord or agent must already have `verification_status: "verified"` on their
 
 Required fields: `title`, `description`, `price` (or `annualRent`), `state`, `lga`, and `address`. Photos are optional and capped at 3.
 
+Optional fields accepted on create and on `PUT /accommodations/:id`:
+
+* `accommodationType` — property type. Allowed: `single-room`, `self-contain`, `room-and-parlour`, `one-bedroom`, `two-bedroom`, `shared-apartment`. Defaults to `self-contain` when omitted. There is no separate bedroom or room-count field; room size is expressed by this value.
+* `caution_fee` (alias `cautionFee`) — defaults to `0`.
+* `agency_fee` (alias `agencyFee`) — defaults to `0`.
+
 * **Access:** Authenticated (`role` must be `admin`, `landlord`, or `agent`)
 
 
@@ -497,8 +509,10 @@ Required fields: `title`, `description`, `price` (or `annualRent`), `state`, `lg
 {
   "title": "Room and parlor mini flat near Oregun",
   "description": "Spacious flat with separate living room, balcony, and steady water.",
+  "accommodationType": "room-and-parlour",
   "price": 450000,
   "caution_fee": 50000,
+  "agency_fee": 20000,
   "address": "8 Kudirat Abiola Way, Oregun, Ikeja, Lagos",
   "state": "Lagos",
   "lga": "Ikeja",
@@ -525,7 +539,10 @@ Required fields: `title`, `description`, `price` (or `annualRent`), `state`, `lg
   "data": {
     "_id": "66f7f9876a1b2c3d4e5f0002",
     "title": "Room and parlor mini flat near Oregun",
+    "accommodationType": "room-and-parlour",
     "price": 450000,
+    "caution_fee": 50000,
+    "agency_fee": 20000,
     "status": "active",
     "verification_status": "pending"
   }
