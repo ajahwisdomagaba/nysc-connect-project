@@ -12,7 +12,7 @@
 | Local base URL       | [http//localhost:5000/api/v1](http://localhost:5000/api/v1)                                                                                                                                                                                                                  |
 | Content type         | application/json (unless an endpoint says multipart/form-data)                                                                                                                                                                                                               |
 | Authorization header | Authorization: Bearer token                                                                                                                                                                                                                                                  |
-| Roles                | corpsmember, landlord, agent, admin (the PRD treats landlord and agent as one MVP role, Landlord/Agent, with two paths)                                                                                                                                                      |
+| Roles                | corps_member, landlord, agent, admin (the PRD treats landlord and agent as one MVP role, Landlord/Agent, with two paths)                                                                                                                                                      |
 | Health check         | GET /health returns a healthy status. Full URL: [https//nysc-connect.onrender.com/api/v1/health](https://nysc-connect.onrender.com/api/v1/health). Routes in this document are written relative to the base URL, which already ends in /api/v1, so do not add /api/v1 again. |
 
 ## Response Formats
@@ -132,7 +132,7 @@ Creates a corps member, landlord, or agent account. Admin self-registration is n
     "ppaname": null,  
     "ppaproximity": null,  
     "role": "landlord",  
-    "verificationstatus": "notsubmitted"  
+    "verification_status": "not_submitted"  
   }  
 }
 
@@ -167,7 +167,7 @@ Logs in with phone number and password. Email is not used to log in. Access: Pub
     "ppa": "State High School",  
     "ppaname": "State High School",  
     "ppaproximity": null,  
-    "role": "corpsmember"  
+    "role": "corps_member"  
   }  
 }
 
@@ -189,9 +189,9 @@ Returns the signed-in user's profile. Access: Authenticated.
     "state": "Lagos",  
     "lga": "Ikeja",  
     "ppa": "State High School",  
-    "ppaname": "State High School",  
-    "ppaproximity": null,  
-    "role": "corpsmember"  
+    "ppa_name": "State High School",  
+    "ppa_proximity": null,  
+    "role": "corps_member"  
   }  
 }
 
@@ -337,7 +337,7 @@ Searches the public feed. Only listings with status active and verificationstatu
     "limit": 10,  
     "total": 4,  
     "totalPages": 1,  
-    "results":   
+    "results":  
       {  
         "id": "66f7f9876a1b2c3d4e5f0001",  
         "title": "Self-contain lodge near Ikeja Secretariat",  
@@ -360,7 +360,7 @@ Searches the public feed. Only listings with status active and verificationstatu
         "createdat": "2026-09-30T10:00:00.000Z",  
         "lastupdated": "2026-09-30T10:00:00.000Z"  
       }  
-      
+
   }  
 }
 
@@ -481,9 +481,9 @@ Uploads up to 3 listing images to Cloudinary with compression. Access: Authentic
   "status": "success",  
   "message": "Images uploaded successfully",  
   "data": {  
-    "images":   
+    "images":  
       { "url": "https//res.cloudinary.com/.../image1.jpg", "publicId": "nyscconnect/accommodations/abc123" }  
-      
+
   }  
 }
 
@@ -523,7 +523,7 @@ Returns Local Guide entries filtered by location and category. Access: Authentic
   "page": 1,  
   "pages": 1,  
   "results": 1,  
-  "data":   
+  "data":  
     {  
       "id": "66f7f3334a1b2c3d4e5f1111",  
       "state": "Lagos",  
@@ -532,7 +532,7 @@ Returns Local Guide entries filtered by location and category. Access: Authentic
       "title": "Commuting via Ikeja Bus Terminal",  
       "description": "Take official yellow buses (Danfo) or use Cowry Card for BRT from terminal..."  
     }  
-    
+
 }
 
 Here results is the number of items on this page and data is the list of items. If no entries exist for an LGA, the list is empty and the client should show an empty state, not an error.
@@ -572,7 +572,7 @@ Lists the signed-in user's saved items. Items return unpopulated references. Acc
 {  
   "status": "success",  
   "message": "Saved items retrieved successfully",  
-  "data":   
+  "data":  
     {  
       "id": "66f7f5554a1b2c3d4e5f2222",  
       "userid": "66f7f1234a1b2c3d4e5f6789",  
@@ -580,7 +580,7 @@ Lists the signed-in user's saved items. Items return unpopulated references. Acc
       "itemid": "66f7f9876a1b2c3d4e5f0001",  
       "createdat": "2026-09-30T12:00:00.000Z"  
     }  
-    
+
 }
 
 **POST /saved**
@@ -656,7 +656,7 @@ Lists user reports. Query parameters: status (default pending; reviewed, resolve
     "total": 1,  
     "page": 1,  
     "limit": 20,  
-    "reports":   
+    "reports":  
       {  
         "id": "66f7f8884a1b2c3d4e5f9999",  
         "reporterid": { "id": "66f7f1234a1b2c3d4e5f6789", "name": "Chinedu Okafor", "phone": "+2348012345678" },  
@@ -667,7 +667,7 @@ Lists user reports. Query parameters: status (default pending; reviewed, resolve
         "status": "pending",  
         "createdat": "2026-09-29T20:45:00.000Z"  
       }  
-      
+
   }  
 }
 
@@ -707,7 +707,7 @@ Landlord and agent account verification queue. Landlords and agents appear toget
     "limit": 20,  
     "total": 1,  
     "totalPages": 1,  
-    "results":   
+    "results":  
       {  
         "id": "66f7f1234a1b2c3d4e5f6789",  
         "name": "Tunde Adeyemi",  
@@ -728,7 +728,7 @@ Landlord and agent account verification queue. Landlords and agents appear toget
           "reviewedat": null  
         }  
       }  
-      
+
   }  
 }
 
