@@ -1,0 +1,832 @@
+{
+  "info": {
+    "_postman_id": "b1a2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+    "name": "NYSC Connect API v1",
+    "description": "Requests for the NYSC Connect MVP. Matches docs/API_CONTRACT_V1.md.\n\nSet baseUrl to http://localhost:5000/api/v1 or https://nysc-connect.onrender.com/api/v1.\n\nLogin and register save the JWT into the collection variable token. Protected requests send Authorization: Bearer {{token}}. Paste an admin token into token before calling the Admin folder.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "accommodationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "localInfoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "savedItemId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "reportId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register corps member",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.token) pm.collectionVariables.set('token', body.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Chinedu Okafor\",\n  \"phone\": \"08012345678\",\n  \"email\": \"chinedu.okafor@email.com\",\n  \"password\": \"Password123!\",\n  \"state\": \"Lagos\",\n  \"lga\": \"Ikeja\",\n  \"ppa\": \"State High School\",\n  \"role\": \"corps_member\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "ppa and ppa_name are optional and store the same field. role defaults to corps_member."
+          }
+        },
+        {
+          "name": "Register landlord",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.token) pm.collectionVariables.set('token', body.token);",
+                  "if (body.user && body.user.id) pm.collectionVariables.set('userId', body.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ada Okonkwo\",\n  \"phone\": \"08098765432\",\n  \"email\": \"ada.okonkwo@email.com\",\n  \"password\": \"Password123!\",\n  \"state\": \"Lagos\",\n  \"lga\": \"Ikeja\",\n  \"role\": \"landlord\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "role may be landlord or agent. Admin self-registration is rejected."
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.token) pm.collectionVariables.set('token', body.token);",
+                  "if (body.user && body.user.id) pm.collectionVariables.set('userId', body.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"08012345678\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login is by phone and password. The response token is saved to the token variable."
+          }
+        },
+        {
+          "name": "Get current user (auth/me)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Get current user (users/me)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me"]
+            }
+          }
+        },
+        {
+          "name": "Update location and PPA",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"state\": \"Lagos\",\n  \"lga\": \"Kosofe\",\n  \"ppa\": \"Kosofe Local Government Secretariat\",\n  \"ppa_proximity\": \"Approximately 10 minutes to the secretariat\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me"]
+            },
+            "description": "Send ppa or ppa_name. Both write ppa_name. ppa_proximity is optional."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Account verification",
+      "item": [
+        {
+          "name": "Get my verification",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/me/verification",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "verification"]
+            },
+            "description": "Landlord or agent only. This is account verification, separate from listing approval."
+          }
+        },
+        {
+          "name": "Submit landlord verification",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_type\": \"nin\",\n  \"id_document_url\": \"https://res.cloudinary.com/demo/image/upload/nin.jpg\",\n  \"authority_type\": \"utility_bill\",\n  \"authority_document_url\": \"https://res.cloudinary.com/demo/image/upload/bill.jpg\",\n  \"prepaid_meter_number\": \"04123456789\",\n  \"zero_upfront_fee_agreed\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me/verification",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "verification"]
+            },
+            "description": "Upload both images first with POST /media/verification-documents. Landlord authority_type is utility_bill or proof_of_ownership. prepaid_meter_number is required for utility_bill."
+          }
+        },
+        {
+          "name": "Submit agent verification",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_type\": \"drivers_license\",\n  \"id_document_url\": \"https://res.cloudinary.com/demo/image/upload/license.jpg\",\n  \"authority_type\": \"authorization_letter\",\n  \"authority_document_url\": \"https://res.cloudinary.com/demo/image/upload/mandate.jpg\",\n  \"zero_upfront_fee_agreed\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me/verification",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "verification"]
+            },
+            "description": "Agent authority_type is authorization_letter or agency_registration. id_type is nin, pvc, drivers_license, or passport."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Locations",
+      "item": [
+        {
+          "name": "Get supported pilot states",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/locations/states",
+              "host": ["{{baseUrl}}"],
+              "path": ["locations", "states"]
+            }
+          }
+        },
+        {
+          "name": "Get pilot LGAs by state (Lagos)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/locations/lgas?state=Lagos",
+              "host": ["{{baseUrl}}"],
+              "path": ["locations", "lgas"],
+              "query": [
+                { "key": "state", "value": "Lagos", "description": "Lagos or Oyo" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get pilot LGAs by state (Oyo)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/locations/lgas?state=Oyo",
+              "host": ["{{baseUrl}}"],
+              "path": ["locations", "lgas"],
+              "query": [
+                { "key": "state", "value": "Oyo" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Accommodations",
+      "item": [
+        {
+          "name": "Search accommodations (Ikeja)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accommodations?state=Lagos&lga=Ikeja&accommodationType=self-contain&sort=newest&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["accommodations"],
+              "query": [
+                { "key": "state", "value": "Lagos" },
+                { "key": "lga", "value": "Ikeja" },
+                { "key": "minPrice", "value": "100000", "disabled": true },
+                { "key": "maxPrice", "value": "500000", "disabled": true },
+                { "key": "accommodationType", "value": "self-contain", "description": "single-room, self-contain, room-and-parlour, one-bedroom, two-bedroom, shared-apartment" },
+                { "key": "amenities", "value": "", "disabled": true },
+                { "key": "sort", "value": "newest", "description": "newest, price_asc, price_desc" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "Public feed. Only status active and verification_status verified. Results are in data.results with page, limit, total, and totalPages."
+          }
+        },
+        {
+          "name": "Search accommodations (Ibadan North)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accommodations?state=Oyo&lga=Ibadan North",
+              "host": ["{{baseUrl}}"],
+              "path": ["accommodations"],
+              "query": [
+                { "key": "state", "value": "Oyo" },
+                { "key": "lga", "value": "Ibadan North" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search accommodations (Kosofe)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accommodations?state=Lagos&lga=Kosofe",
+              "host": ["{{baseUrl}}"],
+              "path": ["accommodations"],
+              "query": [
+                { "key": "state", "value": "Lagos" },
+                { "key": "lga", "value": "Kosofe" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List my accommodations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accommodations/mine?verificationStatus=all&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["accommodations", "mine"],
+              "query": [
+                { "key": "verificationStatus", "value": "all", "description": "pending, verified, rejected, flagged, or all" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "Landlord, agent, or admin. Includes pending and rejected listings."
+          }
+        },
+        {
+          "name": "Get accommodation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accommodations/{{accommodationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["accommodations", "{{accommodationId}}"]
+            },
+            "description": "Requires a Bearer token. Unpublished listings are visible only to an admin or the owner."
+          }
+        },
+        {
+          "name": "Create accommodation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.data && body.data._id) pm.collectionVariables.set('accommodationId', body.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Room and parlor mini flat near Oregun\",\n  \"description\": \"Spacious flat with separate living room, balcony, and steady water.\",\n  \"accommodationType\": \"room-and-parlour\",\n  \"price\": 450000,\n  \"caution_fee\": 50000,\n  \"agency_fee\": 20000,\n  \"address\": \"8 Kudirat Abiola Way, Oregun, Ikeja, Lagos\",\n  \"state\": \"Lagos\",\n  \"lga\": \"Ikeja\",\n  \"ppa_proximity\": \"Approximately 12 mins transit to Ikeja PPA clusters\",\n  \"contact_phone\": \"08044556677\",\n  \"contact_whatsapp\": \"08044556677\",\n  \"property_info\": [\"car_park\", \"borehole_water\"],\n  \"photos\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/accommodations",
+              "host": ["{{baseUrl}}"],
+              "path": ["accommodations"]
+            },
+            "description": "Verified landlord or agent, or admin. The account must already be verified. The listing is saved as verification_status pending. accommodationType defaults to self-contain. caution_fee and agency_fee default to 0. Aliases: annualRent, cautionFee, agencyFee. There is no separate bedroom count and no document field."
+          }
+        },
+        {
+          "name": "Update accommodation",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Room and parlor mini flat near Oregun\",\n  \"description\": \"Updated description after correction.\",\n  \"accommodationType\": \"room-and-parlour\",\n  \"price\": 450000,\n  \"caution_fee\": 50000,\n  \"agency_fee\": 20000,\n  \"address\": \"8 Kudirat Abiola Way, Oregun, Ikeja, Lagos\",\n  \"state\": \"Lagos\",\n  \"lga\": \"Ikeja\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/accommodations/{{accommodationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["accommodations", "{{accommodationId}}"]
+            },
+            "description": "Owner or admin. Editing a verified listing sets verification_status back to pending. Editing a rejected listing does not."
+          }
+        },
+        {
+          "name": "Archive accommodation",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accommodations/{{accommodationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["accommodations", "{{accommodationId}}"]
+            },
+            "description": "Soft delete. Sets status to archived."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Media",
+      "item": [
+        {
+          "name": "Upload accommodation images",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photos",
+                  "type": "file",
+                  "src": [],
+                  "description": "Up to 3 images. Add this field again for each extra file."
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/media/accommodation-images",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "accommodation-images"]
+            },
+            "description": "Admin, landlord, or agent. Pass each returned url in the photos array on POST /accommodations."
+          }
+        },
+        {
+          "name": "Upload verification document",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": [],
+                  "description": "One image, max 5MB. Call once per document."
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/media/verification-documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "verification-documents"]
+            },
+            "description": "Landlord or agent. Pass each returned url to POST /users/me/verification."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Local Guide",
+      "item": [
+        {
+          "name": "List local guide",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/local-info?state=Lagos&lga=Ikeja&category=transport&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["local-info"],
+              "query": [
+                { "key": "state", "value": "Lagos" },
+                { "key": "lga", "value": "Ikeja" },
+                { "key": "category", "value": "transport", "description": "transport, ppa, health, security, food, essential_services" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Category value is essential_services, not essential_service. Entries include last_updated."
+          }
+        },
+        {
+          "name": "List categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/local-info/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["local-info", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Get local guide entry",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/local-info/{{localInfoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["local-info", "{{localInfoId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create local guide entry",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.data && body.data._id) pm.collectionVariables.set('localInfoId', body.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"state\": \"Lagos\",\n  \"lga\": \"Ikeja\",\n  \"category\": \"transport\",\n  \"title\": \"Commuting via Ikeja Bus Terminal\",\n  \"description\": \"Take official yellow buses or use a Cowry card for BRT from the terminal.\",\n  \"source\": \"NYSC Connect\",\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/local-info",
+              "host": ["{{baseUrl}}"],
+              "path": ["local-info"]
+            },
+            "description": "Admin only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Saved",
+      "item": [
+        {
+          "name": "List saved items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/saved",
+              "host": ["{{baseUrl}}"],
+              "path": ["saved"]
+            }
+          }
+        },
+        {
+          "name": "Save accommodation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.data && body.data._id) pm.collectionVariables.set('savedItemId', body.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"item_type\": \"accommodation\",\n  \"item_id\": \"{{accommodationId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/saved",
+              "host": ["{{baseUrl}}"],
+              "path": ["saved"]
+            }
+          }
+        },
+        {
+          "name": "Save local guide",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"item_type\": \"local_info\",\n  \"item_id\": \"{{localInfoId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/saved",
+              "host": ["{{baseUrl}}"],
+              "path": ["saved"]
+            },
+            "description": "item_type is accommodation or local_info. Any of the six guide categories can be saved this way."
+          }
+        },
+        {
+          "name": "Delete saved item",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/saved/{{savedItemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["saved", "{{savedItemId}}"]
+            },
+            "description": "savedItemId is the saved record id, not the listing or guide id."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Report a property",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.data && body.data._id) pm.collectionVariables.set('reportId', body.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"target_type\": \"accommodation\",\n  \"target_id\": \"{{accommodationId}}\",\n  \"reason\": \"scam\",\n  \"details\": \"The contact asked for an inspection fee before viewing.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports"]
+            },
+            "description": "reason is stored exactly as sent: scam, suspicious, outdated, incorrect, or misleading. scam is not rewritten to suspicious. target_type may be local_info."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "List reports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/reports?status=pending&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "reports"],
+              "query": [
+                { "key": "status", "value": "pending", "description": "pending, reviewed, resolved, dismissed, or all" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Admin token required."
+          }
+        },
+        {
+          "name": "Moderate report",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\",\n  \"admin_action\": \"resolved\",\n  \"admin_notes\": \"Confirmed scam attempt. Contact blacklisted.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/reports/{{reportId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "reports", "{{reportId}}"]
+            },
+            "description": "Hides the target only when the stored reason is scam and the report is reviewed or resolved."
+          }
+        },
+        {
+          "name": "List listings for review",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/accommodations?verificationStatus=pending&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "accommodations"],
+              "query": [
+                { "key": "verificationStatus", "value": "pending", "description": "pending, verified, rejected, flagged, or all" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Verify listing",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"verificationStatus\": \"verified\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/accommodations/{{accommodationId}}/verification",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "accommodations", "{{accommodationId}}", "verification"]
+            },
+            "description": "Allowed values are verified and rejected. There is no returned status."
+          }
+        },
+        {
+          "name": "Reject listing",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"verificationStatus\": \"rejected\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/accommodations/{{accommodationId}}/verification",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "accommodations", "{{accommodationId}}", "verification"]
+            }
+          }
+        },
+        {
+          "name": "List account verifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/account-verifications?status=pending&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "account-verifications"],
+              "query": [
+                { "key": "status", "value": "pending", "description": "not_submitted, pending, verified, rejected, or all" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Approve account",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"verified\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/account-verifications/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "account-verifications", "{{userId}}"]
+            },
+            "description": "Approves the landlord or agent account. It does not approve their listings."
+          }
+        },
+        {
+          "name": "Reject account",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"rejected\",\n  \"rejection_reason\": \"Utility bill does not match the stated address.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/account-verifications/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "account-verifications", "{{userId}}"]
+            },
+            "description": "rejection_reason is required when status is rejected."
+          }
+        }
+      ]
+    }
+  ]
+}
