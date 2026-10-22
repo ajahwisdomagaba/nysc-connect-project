@@ -165,8 +165,8 @@ Logs in with phone number and password. Email is not used to log in. Access: Pub
     "state": "Lagos",  
     "lga": "Ikeja",  
     "ppa": "State High School",  
-    "ppaname": "State High School",  
-    "ppaproximity": null,  
+    "ppa_name": "State High School",  
+    "ppa_proximity": null,  
     "role": "corps_member"  
   }  
 }
@@ -197,13 +197,13 @@ Returns the signed-in user's profile. Access: Authenticated.
 
 **PATCH /users/me**
 
-Updates the signed-in user's State, LGA, workplace (PPA), and the travel time to the workplace (ppaproximity). Send either ppa or ppaname. Both write the same stored field. Access: Authenticated.
+Updates the signed-in user's State, LGA, workplace (PPA), and the travel time to the workplace (ppa_proximity). Send either ppa or ppaname. Both write the same stored field. Access: Authenticated.
 
 {  
   "state": "Lagos",  
   "lga": "Kosofe",  
   "ppa": "Kosofe Local Government Secretariat",  
-  "ppaproximity": "Approximately 10 minutes to the secretariat"  
+  "ppa_proximity": "Approximately 10 minutes to the secretariat"  
 }
 
 Response (200 OK): { "message": "Profile updated successfully", "user": { ... } } with the updated user object.
@@ -216,17 +216,17 @@ Returns the landlord or agent's account verification record. Access: Authenticat
   "status": "success",  
   "message": "Account verification fetched successfully",  
   "data": {  
-    "accountverification": {  
-      "status": "notsubmitted",  
-      "idtype": null,  
-      "iddocumenturl": null,  
-      "authoritytype": null,  
-      "authoritydocumenturl": null,  
-      "prepaidmeternumber": null,  
-      "zeroupfrontfeeagreed": false,  
-      "rejectionreason": null,  
-      "submittedat": null,  
-      "reviewedat": null  
+    "account_verification": {  
+      "status": "not_submitted",  
+      "id_type": null,  
+      "id_document_url": null,  
+      "authority_type": null,  
+      "authority_document_url": null,  
+      "prepaid_meter_number": null,  
+      "zero_upfront_fee_agreed": false,  
+      "rejection_reason": null,  
+      "submitted_at": null,  
+      "reviewed_at": null  
     }  
   }  
 }
