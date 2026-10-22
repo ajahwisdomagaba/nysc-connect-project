@@ -100,8 +100,8 @@ Creates a corps member, landlord, or agent account. Admin self-registration is n
   "state": "Lagos",  
   "lga": "Ikeja",  
   "ppa": "State High School",  
-  "ppaname": "State High School",  
-  "role": "corpsmember"  
+  "ppa_name": "State High School",  
+  "role": "corps_member"  
 }
 
 **Example request (landlord or agent)**
@@ -129,14 +129,14 @@ Creates a corps member, landlord, or agent account. Admin self-registration is n
     "state": "Lagos",  
     "lga": "Ikeja",  
     "ppa": null,  
-    "ppaname": null,  
-    "ppaproximity": null,  
+    "ppa_name": null,  
+    "ppa_proximity": null,  
     "role": "landlord",  
     "verification_status": "not_submitted"  
   }  
 }
 
-verificationstatus is returned only for landlord and agent accounts (notsubmitted, pending, verified, rejected). A new landlord or agent cannot post a listing until an admin sets it to verified. Corps member profiles do not include this field.
+verification_status is returned only for landlord and agent accounts (not_submitted, pending, verified, rejected). A new landlord or agent cannot post a listing until an admin sets it to verified. Corps member profiles do not include this field.
 
 **Errors**
 
