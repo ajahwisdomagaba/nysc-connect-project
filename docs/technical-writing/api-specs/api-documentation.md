@@ -39,7 +39,7 @@ GET and POST /users/me/verification use the standard envelope, not the auth enve
 | :---- | :---- |
 | Where the token comes from | The token field in the 201 response from register and the 200 response from login |
 | How to send it | Authorization: Bearer \<token\> |
-| Token payload | { id: userId } |
+| Token payload | { id } |
 | Lifetime | Set by JWT\_EXPIRES\_IN, or 7 days by default |
 | Public routes | register, login, GET /accommodations (feed), locations, health |
 | Protected routes | users/me, reports, saved, local-info, admin, accommodations (create, update, delete, get by ID), media uploads |
@@ -69,7 +69,7 @@ Rules: an unverified, pending, or rejected landlord or agent gets 403 on POST /a
 | Any signed-in user | GET /auth/me, GET and PATCH /users/me, GET /accommodations/:id, GET /local-info, GET /local-info/categories, GET /local-info/:id, GET /saved, POST /saved, DELETE /saved/:id, POST /reports |
 | Landlord or agent | GET and POST /users/me/verification, POST /media/verification-documents, GET /accommodations/mine, POST /accommodations |
 | Landlord, agent, or admin | POST /media/accommodation-images, PUT and DELETE /accommodations/:id |
-| Admin | GET and PATCH /admin/reports, GET /admin/accommodations, PATCH /admin/accommodations/:id/verification, GET /admin/account-verifications, PATCH /admin/account-verifications/:userId, POST /local-info |
+| Admin | GET and PATCH /admin/reports, GET /admin/accommodations, PATCH /admin/accommodations/:id/verification, GET /admin/account-verifications, PATCH /admin/account-verifications/:user_id, POST /local-info |
 
 ### 1\. Authentication and Users
 
@@ -415,16 +415,16 @@ Creates a listing from raw JSON or multipart/form-data. Upload images first with
 | caution\_fee | No | Alias cautionFee. Default 0\. |
 | agency\_fee | No | Alias agencyFee. Default 0\. |
 | ppa\_proximity | No | Text, for example "Approximately 12 mins transit to Ikeja PPA clusters" |
-| contact\_phone, contact\_whatsapp | No |  |
+| contact\_phone, contact\_whatsapp | No | contactPhone is also accepted as an alias for contact\_phone. |
 | property\_info | No | List, for example borehole\_water, prepaid\_meter, fenced\_gate |
 | photos | No | Image URLs, maximum 3 |
 
 | Rule | Detail |
 | :---- | :---- |
 | Landlord or agent | The account must already have verification\_status verified. The listing is saved as verification\_status pending and stays off the public feed until an admin verifies it. |
-| Status fields | Landlords and agents cannot set status or verification\_status. An admin can set both. |
+| Status fields | Landlords and agents cannot set status or verification\_status. On create, an admin may set status and verificationStatus. |
 | Documents | Identity and proof of authority are collected once, on POST /users/me/verification. This endpoint has no document field. A verified account can post many listings, and each listing is approved separately. |
-| Editing | Editing a verified listing with PUT /accommodations/:id resets it to pending and removes it from the public feed until an admin verifies it again. |
+| Editing | Editing a verified listing with PUT /accommodations/:id resets it to pending and removes it from the public feed until an admin verifies it again. Admin updates may set status and verificationStatus. |
 
 **Example request**
 
@@ -694,7 +694,7 @@ Listing review queue. Defaults to listings waiting for admin verification. Query
 
 **PATCH /admin/accommodations/:id/verification**
 
-Approves or rejects a listing. verified sets status to active and publishes it. rejected keeps it hidden. Also accepts verification\_status.
+Approves or rejects a listing. verified sets status to active and publishes it. rejected keeps it hidden. The request accepts verificationStatus or verification\_status.
 
 { "verificationStatus": "verified" }
 
@@ -796,9 +796,9 @@ Pagination is not identical on every list. Treat GET /accommodations as the feed
 
 ## Testing with Postman
 
-The Postman collection uses these variables: baseUrl, token, userId, accommodationId, localInfoId, savedItemId, and reportId. Set baseUrl to [https\://nysc-connect.onrender.com/api/v1](https://nysc-connect.onrender.com/api/v1)  for staging, or [http\://localhost:5000/api/v1](http://localhost:5000/api/v1)  for local development.
+The checked-in Postman collection defines one variable, baseUrl. Set baseUrl to [https\://nysc-connect.onrender.com/api/v1](https://nysc-connect.onrender.com/api/v1)  for staging, or [http\://localhost:5000/api/v1](http://localhost:5000/api/v1)  for local development.
 
-The Register and Login requests read the token from the response and save it in the token variable. Protected requests then send Authorization: Bearer {{token}} automatically. Admin accounts cannot be created through registration, so an admin token must be pasted into the token variable by hand.
+Protected endpoints require an Authorization header containing a token obtained from login. Admin accounts cannot be created through registration; an existing admin account is required to test admin endpoints.
 
 | Folder | Requests |
 | :---- | :---- |
@@ -816,11 +816,11 @@ The Register and Login requests read the token from the response and save it in 
 
 | Step | Request | Why |
 | :---- | :---- | :---- |
-| 1 | Register landlord | Creates an account and saves the token and userId. |
+| 1 | Register landlord | Creates an account; retain the returned token for authenticated requests. |
 | 2 | Upload verification document (twice) | Gets the two document addresses needed next. |
 | 3 | Submit landlord verification | Sends the account for approval. |
 | 4 | Approve account (administrator token) | The landlord must be verified before creating listings. |
-| 5 | Create accommodation | Saves accommodationId. The listing starts as pending. |
+| 5 | Create accommodation | Creates a listing that starts as pending; retain its returned \_id for later requests. |
 | 6 | Verify listing (administrator token) | Makes the listing visible in the public search. |
 | 7 | Search accommodations | Confirms the listing appears. |
 | 8 | Register corps member, then Save accommodation and Report a property | Tests the Corps Member features. |
@@ -978,7 +978,7 @@ The save stores the guide entry ID, so entries from any of the six categories ca
 | POST /users/me/verification | Authenticated Landlord/Agent | Backend-confirmed submission endpoint for account verification information/documents. |
 | PATCH /admin/account-verifications/:userId | Admin | Backend-confirmed Admin review endpoint for a Landlord/Agent account. |
 
-Account status is represented by account\_verification\_status. Confirm exact accepted status values, document fields, upload constraints and Admin decision payload against the backend schema. Unverified Landlord/Agent accounts must not submit listings. Account verification does not approve any listing.
+Account status is represented by account\_verification.status; the user profile also exposes it as verification\_status. Confirm exact accepted status values, document fields, upload constraints and Admin decision payload against the backend schema. Unverified Landlord/Agent accounts must not submit listings. Account verification does not approve any listing.
 
 # **9\. Listing verification and publication**
 
@@ -987,7 +987,7 @@ Account status is represented by account\_verification\_status. Confirm exact ac
 | POST /accommodations | Verified Landlord/Agent | Submits a listing; a new listing remains pending review. |
 | PATCH /admin/accommodations/:id/verification | Admin | Backend-confirmed Admin review endpoint for an individual accommodation listing. |
 
-Listing review uses verification\_status on the listing. A listing remains out of the public feed until an Admin approves/verifies that listing. Listing approval does not change account\_verification\_status. Confirm exact listing status enum and decision payload against the backend schema. Only approved/published listings may appear in public search/detail; pending, returned, rejected or hidden listings must not be public.
+Listing review uses verification\_status on the listing. A listing remains out of the public feed until an Admin approves/verifies that listing. Listing approval does not change account\_verification.status. Confirm exact listing status enum and decision payload against the backend schema. Only approved/published listings may appear in public search/detail; pending, returned, rejected or hidden listings must not be public.
 
 # **10\. Safety and reporting**
 
@@ -1065,4 +1065,3 @@ Document actual HTTP codes and staging examples for validation errors, invalid c
 # **Document status**
 
 Corrected draft aligned with backend confirmations supplied by the project team and the locked MVP. Before publishing as the final API reference, validate route names, request/response schemas, enums and HTTP status codes against the deployed staging API. Unconfirmed details are flagged rather than invented.
-
